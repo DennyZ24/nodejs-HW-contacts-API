@@ -5,7 +5,8 @@ const getContacts = async () => {
 }
 
 const getContactById = async (contactId) => {
-  return Contact.findById(contactId);
+  return await Contact.findById(contactId);
+  
 }
 
 
@@ -18,22 +19,11 @@ const removeContact = async (contactId) => {
 }
 
 const updateContact = async (contactId, body) => {
-  // const allContacts = await listContacts();
-  // const contactById = await getContactById(contactId); 
-  // if (!contactById) {
-  //   return null
-  // }
+  return Contact.findByIdAndUpdate(contactId, body, {new: true});
+}
 
-  // const newContactsList = JSON.stringify(allContacts.map(contact => {
-  //   if (contact.id !== contactId) {
-  //     return contact
-  //   }
-  //   return { ...contact, ...body };
-  // }))
-
-  // fs.writeFile(contactsPath, newContactsList);
-
-  // return {...contactById, ...body};
+const updateFavorite = async (contactId, body) => {
+  return Contact.findByIdAndUpdate(contactId, body, {new: true});
 }
 
 module.exports = {
@@ -42,4 +32,5 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
+  updateFavorite
 }
