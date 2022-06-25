@@ -22,6 +22,6 @@ router.delete('/:contactId', removeContact)
 
 router.put('/:contactId', updateContact)
  
-router.patch('/:contactId', updateFavorite)
+router.patch('/:contactId/favourite', updateFavorite)
 
 module.exports = router
