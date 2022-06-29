@@ -11,7 +11,12 @@ const signupController = async (req, res, next) => {
     }
     const createdUser = await signupServices(req.body);
 
-    res.status(201).json(createdUser)
+    res.status(201).json({
+      email: createdUser.email,
+      subscription: createdUser.subscription,
+      avatarURL: createdUser.avatarURL,
+
+    })
   } catch (error) {
     next(error)
   }
