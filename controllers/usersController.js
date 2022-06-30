@@ -1,4 +1,5 @@
-const { signupServices, loginServices, logoutServices } = require('../services/usersServices');
+const { signupServices, loginServices, logoutServices, updateAvatarServices } = require('../services/usersServices');
+const {uploadImage} = require('../services/imageServices');
 const { schemaAuth } = require('../models/users');
 const { createError } = require('../helpers/createErrors');
 
@@ -58,4 +59,15 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 
-module.exports = { signupController, loginController, logoutController, getCurrentUser };
+const updateAvatar = async (req, res, next) => { 
+  try {
+    const { _id: id } = req.user;
+    const avatarURL = await uploadImage(id, req.file);
+
+    const user = await updateAvatarServices(id, {avatarURL})
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+module.exports = { signupController, loginController, logoutController, getCurrentUser, updateAvatar };
