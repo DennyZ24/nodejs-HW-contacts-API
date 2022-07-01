@@ -57,6 +57,10 @@ const authenticateUser = async (token) => {
 
 const logoutServices = async (id) => {
   await User.findByIdAndUpdate(id, { token: null });
-}
+};
 
-module.exports = { signupServices, loginServices, authenticateUser, logoutServices };
+const updateAvatarServices = async (id, data) => { 
+  return User.findByIdAndUpdate(id, data, { new: true });
+};
+
+module.exports = { signupServices, loginServices, authenticateUser, logoutServices, updateAvatarServices };
