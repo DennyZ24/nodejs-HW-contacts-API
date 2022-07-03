@@ -1,6 +1,14 @@
-const { signupServices, loginServices, logoutServices, updateAvatarServices } = require('../services/usersServices');
+const {
+  signupServices,
+  loginServices,
+  logoutServices,
+  updateAvatarServices,
+  findUser,
+  updateUser,
+} = require('../services/usersServices');
+const {sendEmail} = require('../services/emailServices');
 const {uploadImage} = require('../services/imageServices');
-const { schemaAuth } = require('../models/users');
+const { schemaAuth, schemaResendEmail } = require('../models/users');
 const { createError } = require('../helpers/createErrors');
 
 const signupController = async (req, res, next) => {
@@ -10,7 +18,9 @@ const signupController = async (req, res, next) => {
     if (error) {
       throw createError(400, error.message)
     }
+
     const createdUser = await signupServices(req.body);
+    await sendEmail(createdUser.email, createdUser.verificationToken);
 
     res.status(201).json({
       email: createdUser.email,
@@ -70,4 +80,56 @@ const updateAvatar = async (req, res, next) => {
     next(error);
   }
 };
-module.exports = { signupController, loginController, logoutController, getCurrentUser, updateAvatar };
+
+const confirmEmail = async (req, res, next) => {
+  try {
+    const {verificationToken}  = req.params;
+    const user = await findUser({ verificationToken });
+  
+    if (!user) {
+      throw createError(404, 'Not Found');
+    }
+
+    await updateUser(user._id, { verificationToken: null, verify: true });
+    res.json({ message: 'Verification successful' });
+
+  } catch (error) {
+    next(error);
+  }
+};
+ 
+const resendEmail = async (req, res, next) => {
+  try {
+    const { error } = schemaResendEmail.validate(req.body);
+  
+    if (error) {
+      throw createError(400, error.message)
+    }
+
+    const user = await findUser(req.body);
+
+    if (!user) {
+       throw createError(404, 'User was not found');
+    }
+
+    if (user.verify) {
+      res.status(400).json({message: 'Verification has already been passed'})
+    }
+
+    sendEmail(user.email, user.verificationToken);
+    res.json({message: 'Verification email sent'})
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = {
+  signupController,
+  loginController,
+  logoutController,
+  getCurrentUser,
+  updateAvatar,
+  confirmEmail,
+  resendEmail,
+};

@@ -6,9 +6,11 @@ const getContacts = async () => {
 
 const getContactById = async (contactId) => {
   return await Contact.findById(contactId);
-  
 }
 
+const findContact = async (filters) => { 
+  return Contact.findOne(filters);
+};
 
 const addContact = async (newContact) => {
   return Contact.create(newContact);
@@ -18,12 +20,12 @@ const removeContact = async (contactId) => {
   return Contact.findByIdAndRemove(contactId);
 }
 
-const updateContact = async (contactId, body) => {
-  return Contact.findByIdAndUpdate(contactId, body, {new: true});
+const updateContact = async (contactId, data) => {
+  return Contact.findByIdAndUpdate(contactId, data, {new: true});
 }
 
-const updateFavorite = async (contactId, body) => {
-  return Contact.findByIdAndUpdate(contactId, body, {new: true});
+const updateFavorite = async (contactId, data) => {
+  return Contact.findByIdAndUpdate(contactId, data, {new: true});
 }
 
 module.exports = {
@@ -32,5 +34,6 @@ module.exports = {
   removeContact,
   addContact,
   updateContact,
-  updateFavorite
+  updateFavorite,
+  findContact,
 }
