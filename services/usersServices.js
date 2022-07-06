@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const {SECRET_KEY} = process.env;
 
-
 const signupServices = async (userData) => {
   const { email, password } = userData;
   const someUser = await User.findOne({ email });
@@ -26,6 +25,11 @@ const loginServices = async (userData) => {
   const { email, password } = userData;
 
   const user = await User.findOne({ email });
+
+  if (user && !user.verify) {
+    throw createError(401, 'Please confirm your email.')
+  }
+
   if (!user) {
     throw createError(401, 'Email or password is wrong')
   }
@@ -63,4 +67,20 @@ const updateAvatarServices = async (id, data) => {
   return User.findByIdAndUpdate(id, data, { new: true });
 };
 
-module.exports = { signupServices, loginServices, authenticateUser, logoutServices, updateAvatarServices };
+const updateUser = async (id, data) => {
+    return User.findByIdAndUpdate(id, data, {new: true});
+}
+
+const findUser = async (filters) => {
+    return User.findOne(filters);
+}
+
+module.exports = {
+  signupServices,
+  loginServices,
+  authenticateUser,
+  logoutServices,
+  updateAvatarServices,
+  updateUser,
+  findUser,
+};

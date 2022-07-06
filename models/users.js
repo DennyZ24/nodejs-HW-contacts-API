@@ -1,6 +1,7 @@
 const { Schema, model } = require('mongoose');
 const Joi = require('joi');
 const gravatar = require('gravatar');
+const {v4} = require('uuid');
 
 const schema = new Schema({
   password: {
@@ -26,7 +27,18 @@ const schema = new Schema({
     default: () => {
       return gravatar.url(this.email, {}, true)
     }
-  }
+  },
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    required: [true, 'Verify token is required'],
+    default: function () {
+            return v4();
+        }
+  },
 });
 
 const User = model('user', schema);
@@ -34,6 +46,10 @@ const User = model('user', schema);
 const schemaAuth = Joi.object({
   email: Joi.string().email({ minDomainSegments: 2 }).required(),
   password: Joi.string().min(5).required(),
+});
+
+const schemaResendEmail = Joi.object({
+  email: Joi.string().email({ minDomainSegments: 2 }).required(),
 })
 
-module.exports = { User, schemaAuth };
+module.exports = { User, schemaAuth, schemaResendEmail };
